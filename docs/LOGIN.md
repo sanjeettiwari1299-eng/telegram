@@ -79,11 +79,28 @@ Number login bilkul supported hai — ye wahi official flow hai jo web.telegram.
 
 ---
 
-## 4. Common errors
+## 4. “QR code hi nahi aa raha” — sabse common wajah
+
+Agar login screen khaali hai / QR draw nahi hota, 99% chance ye hai ki build me **API credentials
+missing** hain. Us case me Telegram har request `API_ID_INVALID` se reject karta hai, is liye login
+token ban hi nahi paata.
+
+Pehchano:
+- App ke top pe **amber banner**: *“API credentials missing”* dikhega
+- GitHub Actions run ke **annotations** me warning: *“Add TELEGRAM_API_ID and TELEGRAM_API_HASH …”*
+
+Fix:
+
+1. *Settings → Secrets and variables → Actions* me `TELEGRAM_API_ID` + `TELEGRAM_API_HASH` add karo
+2. *Actions → Deploy to GitHub Pages → Run workflow* (ya koi push)
+3. Hard refresh (Ctrl/Cmd + Shift + R) — service worker purana bundle cache kar sakta hai
+
+## 5. Common errors
 
 | Error | Matlab / fix |
 | --- | --- |
 | `API_ID_INVALID` | `TELEGRAM_API_ID` / `TELEGRAM_API_HASH` galat ya missing hain — my.telegram.org se dobara check karo (aur secrets add karne ke baad redeploy karo) |
+| QR box khaali / spinner | Credentials missing (upar section 4 dekho) ya Telegram WebSocket aapke network pe block hai |
 | `PHONE_NUMBER_INVALID` | Country code ke saath poora number daalo, `+91` ke baad space/`0` nahi |
 | `FLOOD_WAIT_xxx` | Telegram ne temporarily rate-limit kiya — xxx seconds/ghante ruk kar try karo |
 | `SESSION_PASSWORD_NEEDED` | 2FA password maanga ja raha hai — apna Telegram cloud password daalo |
@@ -91,7 +108,7 @@ Number login bilkul supported hai — ye wahi official flow hai jo web.telegram.
 
 ---
 
-## 5. Security notes
+## 6. Security notes
 
 - `api_hash` sirf build time pe bundle hota hai; repo me **secret** ke roop me rakho.
 - Ye client aapke browser me session store karta hai (IndexedDB/localStorage) — public/shared computer pe login mat karo, ya baad me **Settings → Devices → Terminate** kar do.

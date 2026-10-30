@@ -36,6 +36,7 @@ import { getIsInBackground } from '../hooks/window/useBackgroundMode';
 
 import Auth from './auth/Auth';
 import Notifications from './common/Notifications';
+import CredentialsBanner from './fork/CredentialsBanner';
 import HackerHud from './fork/HackerHud';
 import WelcomeOverlay from './fork/WelcomeOverlay';
 import UiLoader from './common/UiLoader';
@@ -275,6 +276,7 @@ const App = ({
       </Transition>
       {activeKey === AppScreens.auth && isTestServer && <div className="test-server-badge">{lang('TestServer')}</div>}
       <Notifications />
+      <CredentialsBanner />
       <HackerHud />
       <WelcomeOverlay />
     </UiLoader>
