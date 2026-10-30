@@ -60,8 +60,23 @@ jobs:
           API_ID="${SECRET_API_ID:-${VAR_API_ID}}"
           API_HASH="${SECRET_API_HASH:-${VAR_API_HASH}}"
 
+          # Diagnose WHERE the credentials came from (source + length only, never the value).
+          ID_SRC="none"
+          if [ -n "$SECRET_API_ID" ]; then
+            ID_SRC="secret"
+          elif [ -n "$VAR_API_ID" ]; then
+            ID_SRC="variable"
+          fi
+          HASH_SRC="none"
+          if [ -n "$SECRET_API_HASH" ]; then
+            HASH_SRC="secret"
+          elif [ -n "$VAR_API_HASH" ]; then
+            HASH_SRC="variable"
+          fi
+          echo "::notice title=Credential sources::api_id=${ID_SRC} (${#API_ID} chars), api_hash=${HASH_SRC} (${#API_HASH} chars) in ${GITHUB_REPOSITORY}"
+
           if [ -z "$API_ID" ] || [ -z "$API_HASH" ]; then
-            echo "::warning title=Telegram API credentials missing::Add TELEGRAM_API_ID and TELEGRAM_API_HASH (from https://my.telegram.org) as repository Secrets to make login work. Building a placeholder bundle for now."
+            echo "::warning title=Telegram API credentials missing::This build got api_id=${ID_SRC}, api_hash=${HASH_SRC}. Add BOTH as *repository* secrets: Settings -> Secrets and variables -> Actions -> Secrets tab (exact names TELEGRAM_API_ID / TELEGRAM_API_HASH, no spaces). Environment secrets do NOT reach this job, and they must be on ${GITHUB_REPOSITORY}. Building a placeholder bundle for now."
             API_ID="1"
             API_HASH="00000000000000000000000000000000"
           fi
