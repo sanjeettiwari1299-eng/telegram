@@ -95,7 +95,7 @@ The fork keeps itself up to date. You should never need to touch it.
 | --- | --- | --- |
 | **`Sync upstream`** (`.github/workflows/upstream-sync.yml`) | Pulls the newest `Ajaxy/telegram-tt`, applies the delta, typechecks + builds, commits, pushes and deploys | Daily, 03:17 UTC |
 | **`Deploy to GitHub Pages`** | Publishes `dist/` — runs on every push to `main` and is also called by the sync workflow | On push / on sync |
-| **`Auto-merge bot PRs`** | Merges Dependabot PRs for GitHub Actions versions (patch/minor) | On PR |
+| **`Auto-merge bot PRs`** | Merges Dependabot PRs for GitHub Actions versions (any bump, after validating the workflow YAML) | On PR |
 | **Dependabot** (`.github/dependabot.yml`) | Opens one grouped PR per week for action updates | Weekly, Monday |
 
 ### How the sync works
@@ -158,8 +158,14 @@ TELEGRAM_API_HASH=your_api_hash
 BASE_URL=http://localhost:1234/
 ```
 
-Get `api_id` / `api_hash` from <https://my.telegram.org> → *API development tools*.
-**Never commit `.env`** — it is git-ignored.
+Get `api_id` / `api_hash` from <https://my.telegram.org> → *API development tools*
+(step-by-step: [`docs/LOGIN.md`](docs/LOGIN.md)). **Never commit `.env`** — it is git-ignored.
+
+### Logging in
+
+Two flows, both unmodified Telegram: **QR code** (phone → Settings → Devices → Link Desktop Device)
+or **phone number + OTP** (and the cloud password if 2FA is enabled).
+Full walkthrough, screenshots-free troubleshooting and the API key guide: [`docs/LOGIN.md`](docs/LOGIN.md).
 
 ## 2. Going live on GitHub Pages
 
