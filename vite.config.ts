@@ -88,6 +88,11 @@ export default defineConfig(({ mode }): UserConfig => {
   const isDevelopmentMode = mode === 'development';
   const telegramApiId = env.TELEGRAM_API_ID || '';
   const telegramApiHash = env.TELEGRAM_API_HASH || '';
+  // The deploy workflow falls back to a placeholder pair when the repository has no
+  // TELEGRAM_API_ID / TELEGRAM_API_HASH secrets. Telegram rejects such a client, so
+  // the UI shows an explicit banner instead of a silently empty QR code.
+  const areCredentialsMissing = !telegramApiId || !telegramApiHash
+    || telegramApiId === '1' || /^0+$/.test(telegramApiHash);
   const workerReportBundles: OutputBundle[] = [];
   const plugins: PluginOption[] = [
     buildGitInfoPlugin({
@@ -179,6 +184,7 @@ export default defineConfig(({ mode }): UserConfig => {
     TG_APPLE_ICON: appleIcon,
     TG_MAIN_ICON: mainIcon,
     TG_MANIFEST: manifest,
+    TG_CREDENTIALS_MISSING: areCredentialsMissing ? '1' : '',
     TG_TELEGRAM_API_ID: telegramApiId,
     TG_TELEGRAM_API_HASH: telegramApiHash,
     TG_TEST_SESSION: env.TEST_SESSION || '',
