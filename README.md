@@ -87,6 +87,21 @@ Telegram's data centers (and Telegram's own media CDNs), plus the `t.me` links y
 
 ---
 
+### Login screen branding
+
+The auth shell is rebranded from two **fork-owned** files, so upstream syncs can never bring the
+Telegram mark back:
+
+| File | What it does |
+| --- | --- |
+| `src/assets/telegrow-logo.svg` | Telegrow mark (used by the login logo, the QR center tile and the phone screen) |
+| `src/fork/branding.scss` | High-specificity overrides: logo, emerald accent, QR plane, `TELEGROW // encrypted · private · no ads` tagline |
+| `src/fork/strings.ts` | String overrides applied before any language pack — e.g. `LoginQRTitle` → *Welcome to Telegrow* |
+
+`node dev/branding/applyBranding.mjs` re-syncs the wordmark/tagline with `branding.json`
+(and `index.html`, manifests, `.env`). Strings that refer to the *phone* app
+(“Open Telegram on your phone”) are intentionally left alone — that app is real.
+
 ## Automatic updates (zero maintenance)
 
 The fork keeps itself up to date. You should never need to touch it.
