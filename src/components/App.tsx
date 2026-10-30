@@ -36,6 +36,8 @@ import { getIsInBackground } from '../hooks/window/useBackgroundMode';
 
 import Auth from './auth/Auth';
 import Notifications from './common/Notifications';
+import '../fork/branding.scss';
+
 import CredentialsBanner from './fork/CredentialsBanner';
 import HackerHud from './fork/HackerHud';
 import WelcomeOverlay from './fork/WelcomeOverlay';

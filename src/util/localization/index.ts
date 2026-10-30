@@ -8,6 +8,7 @@ import type {
 } from '../../api/types';
 import type { TimeFormat } from '../../types';
 import type { LangKey, LangVariable } from '../../types/language';
+import { FORK_STRING_OVERRIDES } from '../../fork/strings';
 import {
   type AdvancedLangFnOptions,
   type AdvancedLangFnOptionsWithPlural,
@@ -483,6 +484,10 @@ function getIntlLocale(languageInfo = language) {
 }
 
 function getString(langKey: LangKey, count: number) {
+  // Fork branding wins over every language pack (see src/fork/strings.ts).
+  const forkOverride = FORK_STRING_OVERRIDES[langKey];
+  if (forkOverride !== undefined) return forkOverride;
+
   const shouldForceFallback = FORCE_FALLBACK_LANG && language?.langCode === FALLBACK_LANG_CODE;
   let langPackStringValue = !shouldForceFallback ? langPack?.strings[langKey] : undefined;
   if (langPackStringValue && isDeletedLangString(langPackStringValue)) langPackStringValue = undefined;
