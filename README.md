@@ -184,7 +184,7 @@ Then run **Actions → Deploy to GitHub Pages → Run workflow** (or just push).
 
 Without the two secrets the site still deploys, but login cannot work: Telegram rejects the placeholder
 API ID, so no QR code appears. The app shows an amber **“API credentials missing”** banner in that case —
-add the secrets and re-run the workflow. Full walkthrough: [`docs/PAGES-SETUP.md`](docs/PAGES-SETUP.md).
+add the secrets — the site then rebuilds itself (every 6 hours, and on any push to `main`). Full walkthrough: [`docs/PAGES-SETUP.md`](docs/PAGES-SETUP.md).
 
 ## 3. Rebranding
 
