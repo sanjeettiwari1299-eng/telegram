@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  # Self-healing rebuild: secrets/vars are only read at build time, so a build must
+  # happen after they are added. This bakes them in automatically (every 6h).
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
   workflow_call:
 
@@ -79,6 +83,14 @@ jobs:
         env:
           SOURCEMAP: '0'
         run: npm run build:production
+
+      - name: Confirm API credentials landed in the bundle
+        run: |
+          if grep -rq "00000000000000000000000000000000" dist/assets 2>/dev/null; then
+            echo "::warning title=Placeholder credentials in this build::The bundle still contains the placeholder API credentials, so login cannot work. Add TELEGRAM_API_ID and TELEGRAM_API_HASH under Settings -> Secrets and variables -> Actions (exact names, no spaces), then re-run this workflow."
+          else
+            echo "::notice title=API credentials baked in::Login (QR code and phone number) will work on this build."
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v6

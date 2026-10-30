@@ -93,7 +93,12 @@ Fix:
 
 1. *Settings → Secrets and variables → Actions* me `TELEGRAM_API_ID` + `TELEGRAM_API_HASH` add karo
 2. *Actions → Deploy to GitHub Pages → Run workflow* (ya koi push)
-3. Hard refresh (Ctrl/Cmd + Shift + R) — service worker purana bundle cache kar sakta hai
+3. Unke baad **build hona zaroori** hai — secrets sirf build ke waqt bundle me jaate hain:
+   - koi bhi push to `main`, ya
+   - *Actions → Deploy to GitHub Pages → Run workflow*, ya
+   - site har **6 ghante** me khud rebuild hoti hai (`schedule: 17 */6 * * *`), to bhool jao tab bhi apne aap theek ho jayega
+4. Build ke **Annotations** check karo: *“API credentials baked in”* = sahi, *“Placeholder credentials in this build”* = naam galat hain
+5. Hard refresh (Ctrl/Cmd + Shift + R) — service worker purana bundle cache kar sakta hai
 
 ## 5. Common errors
 
