@@ -1,6 +1,7 @@
 import { getGlobal } from '../global';
 
 import { APP_CODE_NAME, DEBUG } from '../config';
+import { FORK_BLOCK_WEBSYNC } from '../fork/config';
 import { IS_TAURI } from './browser/globalEnvironment';
 import { hasStoredSession } from './sessions';
 
@@ -28,7 +29,8 @@ const saveSync = (authed: boolean) => {
 let lastTimeout: number | undefined;
 
 export const forceWebsync = (authed: boolean) => {
-  if (IS_TAURI) return undefined;
+  // Telegrow: no cross-domain websync beacon is sent
+  if (IS_TAURI || FORK_BLOCK_WEBSYNC) return undefined;
   const currentTs = getTs();
 
   const { canRedirect, ts } = JSON.parse(localStorage.getItem(WEBSYNC_KEY) || '{}');

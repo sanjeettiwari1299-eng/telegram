@@ -69,6 +69,8 @@ import { formatStarsAsText } from '../../../util/localization/format';
 import { debounce, onTickEnd, rafPromise } from '../../../util/schedulers';
 import { getServerTime } from '../../../util/serverTime';
 import { callApi, cancelApiProgress } from '../../../api/gramjs';
+import { FORK_BLOCK_ADS } from '../../../fork/config';
+import { emitHackerFeedback } from '../../../fork/hackerFeedback';
 import {
   getIsSavedDialog,
   getUserFullName,
@@ -520,6 +522,8 @@ addActionHandler('sendMessage', async (global, actions, payload): Promise<void> 
     return;
   }
 
+  emitHackerFeedback('packet dispatched', 'mtproto · encrypted');
+
   let { chatId, threadId, type } = messageList || {};
   if (isStoryReply) {
     chatId = storyPeerId!;
@@ -883,6 +887,8 @@ addActionHandler('editMessage', (global, actions, payload): ActionReturnType => 
   if (!messageList) {
     return;
   }
+
+  emitHackerFeedback('payload rewritten', 'sync · in place');
 
   let currentMessageKey: MessageKey | undefined;
   const progressCallback = attachments ? (progress: number, messageKey: MessageKey) => {
@@ -1259,6 +1265,8 @@ addActionHandler('pinMessage', (global, actions, payload): ActionReturnType => {
     return;
   }
 
+  emitHackerFeedback(isUnpin ? 'pin released' : 'packet pinned', 'channel state');
+
   void callApi('pinMessage', {
     chat, messageId, isUnpin, isOneSide, isSilent,
   });
@@ -1291,6 +1299,8 @@ addActionHandler('deleteMessages', (global, actions, payload): ActionReturnType 
   if (!messageList) {
     return;
   }
+
+  emitHackerFeedback('packet purged', 'secure wipe');
   const { chatId, threadId } = messageList;
   const chat = selectChat(global, chatId)!;
   const messageIdsToDelete = messageIds.filter((id) => {
@@ -2060,6 +2070,8 @@ addActionHandler('forwardMessages', (global, actions, payload): ActionReturnType
   const toChat = toChatId ? selectChat(global, toChatId) : undefined;
   if (!toChat) return;
 
+  emitHackerFeedback('packet relayed', 'handoff · encrypted');
+
   // `sendMessage` advances the gradient for forwards-with-comment, which go through it instead
   if (!scheduledAt) {
     actions.animateMessageSending({ chatId: toChat.id, threadId: toThreadId, tabId });
@@ -2628,6 +2640,8 @@ async function sendMessagesWithNotification<T extends GlobalState>(
 
 addActionHandler('sendMessages', async (global, actions, payload): Promise<void> => {
   const { sendParams } = payload;
+
+  if (sendParams.length > 1) emitHackerFeedback('bulk dispatch', `${sendParams.length} packets`);
   await Promise.all(sendParams.map(async (params) => {
     if (params.forwardedLocalMessagesSlice && params.forwardParams) {
       await rafPromise();
@@ -2741,6 +2755,9 @@ addActionHandler('loadSendPaidReactionsAs', async (global, actions, payload): Pr
 });
 
 addActionHandler('loadSponsoredMessages', async (global, actions, payload): Promise<void> => {
+  // Telegrow: Telegram Ads are disabled in this fork — nothing is fetched or rendered
+  if (FORK_BLOCK_ADS) return;
+
   if (selectIsCurrentUserFrozen(global)) return;
 
   const { peerId } = payload;
@@ -2764,12 +2781,16 @@ addActionHandler('loadSponsoredMessages', async (global, actions, payload): Prom
 });
 
 addActionHandler('viewSponsored', (global, actions, payload): ActionReturnType => {
+  if (FORK_BLOCK_ADS) return undefined;
+
   const { randomId } = payload;
 
   void callApi('viewSponsoredMessage', { random: randomId });
 });
 
 addActionHandler('clickSponsored', (global, actions, payload): ActionReturnType => {
+  if (FORK_BLOCK_ADS) return undefined;
+
   const { randomId, isMedia, isFullscreen } = payload;
 
   void callApi('clickSponsoredMessage', {
@@ -2778,6 +2799,8 @@ addActionHandler('clickSponsored', (global, actions, payload): ActionReturnType 
 });
 
 addActionHandler('reportSponsored', async (global, actions, payload): Promise<void> => {
+  if (FORK_BLOCK_ADS) return;
+
   const {
     peerId, randomId, option = '', tabId = getCurrentTabId(),
   } = payload;

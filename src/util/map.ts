@@ -55,9 +55,14 @@ export function getMetersPerPixel(lat: number, zoom: number) {
   return (156543.03392 * Math.cos(lat * (Math.PI / 180))) / 2 ** zoom;
 }
 
+// Telegrow: third-party venue icons (Foursquare CDN) removed so rendering a
+// location never leaks a request to an external host. Falls back to a
+// transparent local pixel.
+const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 export function getVenueIconUrl(type?: string) {
   if (!type) return '';
-  return `https://ss3.4sqi.net/img/categories_v2/${type}_88.png`;
+  return TRANSPARENT_PIXEL;
 }
 
 // https://github.com/TelegramMessenger/Telegram-iOS/blob/2a32c871882c4e1b1ccdecd34fccd301723b30d9/submodules/LocationResources/Sources/VenueIconResources.swift#L104

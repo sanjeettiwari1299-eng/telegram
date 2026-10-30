@@ -7,6 +7,8 @@ code base (the official client behind [web.telegram.org/a](https://web.telegram.
 - 🌐 Live site: **https://sanjeettiwari1299-eng.github.io/telegram/**
 - 🖤 Brand: **Telegrow** — dark terminal look, custom logo, custom PWA metadata
 - 🚫 **No Telegram Premium, no Stars, no gifts, no purchase buttons**
+- 🛡️ **No ads, no sponsored posts, no third-party trackers or beacons**
+- 💻 **Hacker HUD**: every send / delete / edit / forward / pin answers with a terminal chip
 - 👋 Custom boot screen: `WELCOME BACK, LAKSHAY` on every open
 - ⚙️ Deploy: GitHub Actions → GitHub Pages (`.github/workflows/deploy-pages.yml`)
 - 📜 License: GPL-3.0-or-later (same as upstream)
@@ -45,6 +47,43 @@ export const FORK_OWNER_NAME = 'Lakshay';       // name in the greeting
 export const FORK_SHOW_WELCOME = true;          // false to turn it off
 export const FORK_WELCOME_DURATION = 4200;      // ms on screen
 ```
+
+### Hacker HUD (action feedback)
+
+Every core action answers with a terminal chip in the corner — `> PACKET DISPATCHED · mtproto · encrypted`,
+`> PACKET PURGED · secure wipe`, and so on. Wired in `src/global/actions/api/messages.ts` via
+`emitHackerFeedback()` (`src/fork/hackerFeedback.ts`), rendered by `src/components/fork/HackerHud.tsx`.
+
+| Action | Chip |
+| --- | --- |
+| Send message | `packet dispatched · mtproto · encrypted` |
+| Send many | `bulk dispatch · N packets` |
+| Edit message | `payload rewritten · sync · in place` |
+| Delete message | `packet purged · secure wipe` |
+| Forward | `packet relayed · handoff · encrypted` |
+| Pin / unpin | `packet pinned` / `pin released` |
+
+Add more anywhere in the code base:
+
+```ts
+import { emitHackerFeedback } from '../../../fork/hackerFeedback';
+
+emitHackerFeedback('channel opened', 'secure');
+```
+
+### Ads, trackers & telemetry removed
+
+| Surface | What was done |
+| --- | --- |
+| Telegram Ads in chats | `loadSponsoredMessages` never fetches — no ad is requested, rendered or cached |
+| Ad telemetry | `viewSponsored`, `clickSponsored`, `reportSponsored` are hard no-ops (no view/click pings) |
+| Sponsored search slot | `fetchSponsoredPeer` is no longer called; results list is ads-free |
+| t.me "websync" beacon | Cross-domain `<script>` ping disabled (`FORK_BLOCK_WEBSYNC`) |
+| Foursquare icon CDN | Venue icons no longer hit `ss3.4sqi.net`; the host was also dropped from the CSP |
+| Third-party analytics | None existed in the upstream client and none were added; no cookies/ETag beacons |
+
+The only outbound connections left are the ones that make Telegram work: the MTProto WebSocket to
+Telegram's data centers (and Telegram's own media CDNs), plus the `t.me` links you choose to open.
 
 ---
 

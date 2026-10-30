@@ -37,10 +37,8 @@ addActionHandler('setGlobalSearchQuery', (global, actions, payload): ActionRetur
 
   if (query && !chatId) {
     void searchThrottled(async () => {
-      const [searchResult, sponsoredResult] = await Promise.all([
-        callApi('searchChats', { query }),
-        callApi('fetchSponsoredPeer', { query }),
-      ]);
+      // Telegrow: the sponsored (ad) search slot is never requested
+      const searchResult = await callApi('searchChats', { query });
 
       global = getGlobal();
       const currentSearchQuery = selectCurrentGlobalSearchQuery(global, tabId);
@@ -63,7 +61,7 @@ addActionHandler('setGlobalSearchQuery', (global, actions, payload): ActionRetur
           ...selectTabState(global, tabId).globalSearch.globalResults,
           peerIds: globalResultIds,
         },
-        sponsoredPeer: sponsoredResult,
+        sponsoredPeer: undefined,
       }, tabId);
 
       setGlobal(global);

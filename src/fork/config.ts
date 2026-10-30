@@ -21,3 +21,17 @@ export const FORK_SHOW_WELCOME = true;
 
 /** How long the welcome screen stays on screen, in ms (includes the fade out). */
 export const FORK_WELCOME_DURATION = 4200;
+
+/**
+ * Telegram Ads (sponsored messages) and the sponsored search slot are switched
+ * off, including their view/click telemetry. No third-party analytics are used
+ * by this client at all.
+ */
+export const FORK_BLOCK_ADS = true;
+
+/**
+ * t.me "websync" beacon: a cross-domain <script> ping used by the official
+ * web.telegram.org deployment. Useless (and a third-party request) on a
+ * self-hosted fork, so it is disabled.
+ */
+export const FORK_BLOCK_WEBSYNC = true;
