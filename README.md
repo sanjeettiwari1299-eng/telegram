@@ -95,7 +95,7 @@ The fork keeps itself up to date. You should never need to touch it.
 | --- | --- | --- |
 | **`Sync upstream`** (`.github/workflows/upstream-sync.yml`) | Pulls the newest `Ajaxy/telegram-tt`, applies the delta, typechecks + builds, commits, pushes and deploys | Daily, 03:17 UTC |
 | **`Deploy to GitHub Pages`** | Publishes `dist/` — runs on every push to `main` and is also called by the sync workflow | On push / on sync |
-| **`Auto-merge bot PRs`** | Merges Dependabot PRs for GitHub Actions versions (any bump, after validating the workflow YAML) | On PR |
+| **`Auto-merge bot PRs`** | Merges Dependabot PRs for GitHub Actions versions (any bump, after validating the workflow YAML) and re-dispatches the Pages deploy to prove the bumped actions work | On PR |
 | **Dependabot** (`.github/dependabot.yml`) | Opens one grouped PR per week for action updates | Weekly, Monday |
 
 ### How the sync works

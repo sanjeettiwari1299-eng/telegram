@@ -11,6 +11,9 @@ on: pull_request
 permissions:
   contents: write
   pull-requests: write
+  # Needed to re-dispatch the Pages deploy after a merge made with GITHUB_TOKEN
+  # (pushes made by GITHUB_TOKEN do not trigger other workflows)
+  actions: write
 
 jobs:
   dependabot:
@@ -69,3 +72,14 @@ jobs:
           # Prefer a regular merge commit (keeps the bump readable), fall back to squash
           # if the repository does not allow merge commits.
           gh pr merge --merge --delete-branch "$PR_URL" || gh pr merge --squash --delete-branch "$PR_URL"
+
+      - name: Exercise the bumped actions with a real deploy
+        if: steps.scope.outputs.merge == 'true' && success()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # A CI-only merge made by GITHUB_TOKEN does not trigger the Pages workflow,
+          # so dispatch it explicitly. This proves the bumped action versions still
+          # work right away instead of finding out during the next upstream sync.
+          gh workflow run deploy-pages.yml --ref main
