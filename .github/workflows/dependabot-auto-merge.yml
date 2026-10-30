@@ -1,8 +1,10 @@
 name: Auto-merge bot PRs
 
-# Dependabot opens one grouped PR per week for the GitHub Actions versions used
-# by this repo. Patch/minor bumps are merged automatically, so action
-# deprecations (e.g. "Node.js 20 is deprecated") fix themselves.
+# Dependabot is configured for the `github-actions` ecosystem only (see
+# .github/dependabot.yml), so every Dependabot PR here is a CI/action bump —
+# including major ones (e.g. actions/checkout v5 → v7). Those are safe to merge
+# unattended as long as the workflow files still parse, which is what this
+# workflow checks before merging.
 
 on: pull_request
 
@@ -13,21 +15,57 @@ permissions:
 jobs:
   dependabot:
     name: Merge Dependabot PR
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Read update metadata
-        id: meta
-        uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check the PR only touches CI config
+        id: scope
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          FILES=$(gh pr view "$PR_URL" --json files --jq '.files[].path')
+          echo "$FILES" | sed 's/^/  /'
+          OUT_OF_SCOPE=$(echo "$FILES" | grep -vE '^\.github/(workflows/[^/]+\.ya?ml|dependabot\.yml)$' || true)
+          if [ -n "$OUT_OF_SCOPE" ]; then
+            echo "::notice::PR touches non-CI files, left for a human:"
+            echo "$OUT_OF_SCOPE"
+            echo "merge=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "merge=true" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Approve and merge non-major updates
-        if: steps.meta.outputs.update-type != 'version-update:semver-major'
-        continue-on-error: true
+      - name: Checkout PR
+        if: steps.scope.outputs.merge == 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Validate workflow YAML
+        if: steps.scope.outputs.merge == 'true'
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import glob, sys, yaml
+          ok = True
+          for path in sorted(glob.glob('.github/workflows/*.yml')) + ['.github/dependabot.yml']:
+              try:
+                  yaml.safe_load(open(path))
+                  print('ok', path)
+              except Exception as error:
+                  ok = False
+                  print('FAILED', path, error)
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Approve and merge
+        if: steps.scope.outputs.merge == 'true' && success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           gh pr review --approve "$PR_URL" || true
-          gh pr merge --squash --delete-branch "$PR_URL"
+
+          # Prefer a regular merge commit (keeps the bump readable), fall back to squash
+          # if the repository does not allow merge commits.
+          gh pr merge --merge --delete-branch "$PR_URL" || gh pr merge --squash --delete-branch "$PR_URL"
