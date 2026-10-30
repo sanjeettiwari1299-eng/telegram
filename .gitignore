@@ -12,6 +12,8 @@ dev/perf/screenshot*
 .github/workflows/*
 !.github/workflows/package-and-publish.yml
 !.github/workflows/deploy-pages.yml
+!.github/workflows/upstream-sync.yml
+!.github/workflows/dependabot-auto-merge.yml
 dist
 public/build-stats.json
 public/statoscope-report.html

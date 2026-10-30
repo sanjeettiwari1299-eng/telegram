@@ -1,0 +1,141 @@
+name: Sync upstream (Telegram Web A)
+
+# Keeps the fork up to date with Ajaxy/telegram-tt without any manual work.
+# Applies the upstream delta file by file, verifies that the app still builds,
+# pushes to main and then triggers the Pages deployment.
+
+on:
+  schedule:
+    # Daily at 03:17 UTC (08:47 IST)
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.sync.outputs.changed }}
+      pushed: ${{ steps.push.outputs.pushed }}
+      upstream_sha: ${{ steps.sync.outputs.upstream_sha }}
+      from_sha: ${{ steps.sync.outputs.from_sha }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Apply upstream delta
+        id: sync
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node dev/upstream-sync.mjs
+
+      - name: Write .env
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          APP_TITLE_VAR: ${{ vars.APP_TITLE }}
+        run: |
+          {
+            echo "TELEGRAM_API_ID=${API_ID:-1}"
+            echo "TELEGRAM_API_HASH=${API_HASH:-00000000000000000000000000000000}"
+            echo "BASE_URL=https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/"
+            echo "APP_TITLE=${APP_TITLE_VAR:-Telegrow}"
+            echo "APP_NAME=${APP_TITLE_VAR:-Telegrow}"
+          } > .env
+
+      - name: Install dependencies
+        id: install
+        if: steps.sync.outputs.changed == 'true'
+        continue-on-error: true
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        id: typecheck
+        if: steps.sync.outputs.changed == 'true' && steps.install.outcome == 'success'
+        continue-on-error: true
+        run: npx tsc --noEmit
+
+      - name: Build
+        id: build
+        if: steps.sync.outputs.changed == 'true' && steps.typecheck.outcome == 'success'
+        continue-on-error: true
+        env:
+          SOURCEMAP: '0'
+        run: npm run build:production
+
+      - name: Commit and push
+        id: push
+        if: steps.sync.outputs.changed == 'true' && steps.build.outcome == 'success'
+        run: |
+          git config user.name 'telegrow-sync[bot]'
+          git config user.email 'telegrow-sync@users.noreply.github.com'
+          git add -A
+          git commit -m "chore(upstream): sync to ${{ steps.sync.outputs.upstream_sha }}"
+          git push origin HEAD:main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report problems
+        if: ${{ steps.sync.outcome != 'success' || (steps.sync.outputs.changed == 'true' && steps.build.outcome != 'success') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CONFLICTS: ${{ steps.sync.outputs.conflicts }}
+          INSTALL: ${{ steps.install.outcome }}
+          TYPECHECK: ${{ steps.typecheck.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          UPSTREAM_SHA: ${{ steps.sync.outputs.upstream_sha }}
+          FROM_SHA: ${{ steps.sync.outputs.from_sha }}
+        run: |
+          TITLE="Upstream sync needs a hand"
+
+          {
+            echo "The automatic upstream sync could not apply cleanly."
+            echo
+            echo "- from: \`${FROM_SHA}\`"
+            echo "- to: \`${UPSTREAM_SHA}\`"
+            echo "- conflicts: \`${CONFLICTS:-0}\`"
+            echo "- npm ci: \`${INSTALL:-skipped}\`"
+            echo "- typecheck: \`${TYPECHECK:-skipped}\`"
+            echo "- build: \`${BUILD:-skipped}\`"
+            echo
+            echo "Full report: ${RUN_URL}"
+            echo
+            echo "_Nothing was pushed — \`main\` and the live site are unchanged._"
+          } > /tmp/issue-body.md
+
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "Issue #$EXISTING is already open — not spamming a new one."
+          else
+            gh issue create --title "$TITLE" --body-file /tmp/issue-body.md
+          fi
+
+  deploy:
+    name: Deploy
+    needs: sync
+    if: needs.sync.outputs.pushed == 'true'
+    uses: ./.github/workflows/deploy-pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    secrets: inherit

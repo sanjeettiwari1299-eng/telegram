@@ -87,26 +87,58 @@ Telegram's data centers (and Telegram's own media CDNs), plus the `t.me` links y
 
 ---
 
-## Will this need maintenance?
+## Automatic updates (zero maintenance)
 
-Short answer: **no routine updates.** It is a static site; GitHub Pages serves it, nothing to restart,
-no servers, no database. It keeps working as long as Telegram keeps the current MTProto/API schema.
+The fork keeps itself up to date. You should never need to touch it.
 
-You only need to touch it when:
+| Automation | What it does | Schedule |
+| --- | --- | --- |
+| **`Sync upstream`** (`.github/workflows/upstream-sync.yml`) | Pulls the newest `Ajaxy/telegram-tt`, applies the delta, typechecks + builds, commits, pushes and deploys | Daily, 03:17 UTC |
+| **`Deploy to GitHub Pages`** | Publishes `dist/` — runs on every push to `main` and is also called by the sync workflow | On push / on sync |
+| **`Auto-merge bot PRs`** | Merges Dependabot PRs for GitHub Actions versions (patch/minor) | On PR |
+| **Dependabot** (`.github/dependabot.yml`) | Opens one grouped PR per week for action updates | Weekly, Monday |
 
-1. **Telegram changes the API / MTProto schema** (a few times a year upstream, usually never breaking
-   for months). Fix = merge upstream and redeploy:
-   ```sh
-   git fetch upstream
-   git merge upstream/master        # resolve conflicts in src/fork/* if any
-   git push
-   ```
-   The Pages workflow redeploys automatically on push.
-2. **You change the branding** → edit `branding.json`, run `node dev/branding/applyBranding.mjs`, push.
-3. **GitHub actions deprecations** → occasionally bump `actions/checkout@v5` etc. GitHub prints a
-   warning in the workflow log when that happens.
+### How the sync works
 
-Everything else (Telegram API keys, secrets, hosting, deploys) is set once.
+This fork does not share git history with upstream (the code was imported as a snapshot and then
+patched), so a plain `git merge upstream/master` is impossible. `dev/upstream-sync.mjs` instead diffs
+the upstream **tree** between the last synced commit (`.github/upstream-sync.json`) and the newest
+commit, then applies it file by file:
+
+1. **Fork-owned paths** (branding, `src/fork/**`, `src/components/fork/**`, workflows, icons,
+   generated assets) — never touched.
+2. **Files you never modified** — replaced with the upstream version.
+3. **Files you patched** (e.g. `src/global/actions/ui/stars.ts`) — real 3-way merge
+   (`git merge-file`, base = upstream at the last sync), so upstream changes and the fork's patches
+   both survive.
+4. **Anything that genuinely conflicts** — nothing is pushed; an issue named **“Upstream sync needs a
+   hand”** is opened with the run link. `main` and the live site stay exactly as they were.
+
+After a successful sync the app is typechecked and production-built **before** the push, so a broken
+upstream commit can never take the live site down — it just produces an issue instead.
+
+### Manual controls
+
+```sh
+# Preview what a sync would change (no writes)
+GITHUB_TOKEN=$(gh auth token) node dev/upstream-sync.mjs --dry-run
+
+# Force a sync right now
+gh workflow run upstream-sync.yml
+
+# Re-point the baseline (e.g. after importing a brand new upstream snapshot)
+# edit .github/upstream-sync.json → lastSyncedSha
+```
+
+### When would you actually need to do something?
+
+Almost never. The only case is a real merge conflict with upstream in a file this fork also patches:
+
+- You get an issue: **“Upstream sync needs a hand”** with the exact conflicting files
+- Fix locally, push, and delete/close the issue — the next scheduled run picks up from there
+
+Everything else (Telegram API changes, dependency bumps, action deprecations, deploys) is handled
+automatically.
 
 ## 1. Local setup
 
