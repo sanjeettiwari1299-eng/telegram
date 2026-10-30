@@ -101,10 +101,13 @@ jobs:
 
       - name: Confirm API credentials landed in the bundle
         run: |
-          if grep -rq "00000000000000000000000000000000" dist/assets 2>/dev/null; then
-            echo "::warning title=Placeholder credentials in this build::The bundle still contains the placeholder API credentials, so login cannot work. Add TELEGRAM_API_ID and TELEGRAM_API_HASH under Settings -> Secrets and variables -> Actions (exact names, no spaces), then re-run this workflow."
+          # With real credentials the placeholder banner is dead-code eliminated from the
+          # JS bundle; with placeholder credentials it stays. (Do not grep for the zero
+          # hash: the tlottie .wasm binaries legitimately contain runs of zeroes.)
+          if grep -rl --include='*.js' "API credentials missing" dist/assets >/dev/null 2>&1; then
+            echo "::warning title=Placeholder credentials in this build::The JS bundle still carries the 'API credentials missing' code path, so login cannot work. Add TELEGRAM_API_ID and TELEGRAM_API_HASH under Settings -> Secrets and variables -> Actions (exact names, no spaces), then re-run this workflow."
           else
-            echo "::notice title=API credentials baked in::Login (QR code and phone number) will work on this build."
+            echo "::notice title=API credentials baked in::Real API credentials are compiled into this build; QR code and phone login are enabled."
           fi
 
       - name: Configure Pages
