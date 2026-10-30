@@ -10,6 +10,7 @@ import {
 import { requestMeasure } from '../../../lib/fasterdom/fasterdom';
 import { getStickerMediaHash } from '../../../global/helpers';
 import { selectIsPremiumPurchaseBlocked } from '../../../global/selectors';
+import { FORK_HIDE_PURCHASES } from '../../../fork/config';
 import { IS_OFFSET_PATH_SUPPORTED } from '../../../util/browser/windowEnvironment';
 import buildClassName from '../../../util/buildClassName';
 import { buildCollectionByKey } from '../../../util/iteratees';
@@ -149,7 +150,8 @@ const UserBirthday = ({
     return lang(`ProfileBirthday${isToday ? 'Today' : ''}Value`, { date: formattedDate });
   }, [age, formattedDate, isToday, lang]);
 
-  const canGiftPremium = isToday && !user.isPremium && !user.isSelf && !isPremiumPurchaseBlocked;
+  const canGiftPremium = isToday && !user.isPremium && !user.isSelf && !isPremiumPurchaseBlocked
+    && !FORK_HIDE_PURCHASES;
 
   const handleOpenGiftModal = useLastCallback(() => {
     openGiftModal({ forUserId: user.id });

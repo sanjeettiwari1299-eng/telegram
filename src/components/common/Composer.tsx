@@ -57,6 +57,7 @@ import {
   STARS_CURRENCY_CODE,
   VIDEO_RECORDING_FILENAME,
 } from '../../config';
+import { FORK_HIDE_PURCHASES } from '../../fork/config';
 import { requestMeasure, requestMutation, requestNextMutation } from '../../lib/fasterdom/fasterdom';
 import {
   canEditMedia,
@@ -3092,7 +3093,7 @@ const Composer = ({
                         <AutoDeleteOutlinedIcon period={autoDeletePeriod} />
                       </Button>
                     )}
-                    {shouldShowGiftButton && (
+                    {shouldShowGiftButton && !FORK_HIDE_PURCHASES && (
                       <Button
                         round
                         faded

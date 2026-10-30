@@ -26,6 +26,7 @@ import {
   getUserFullName,
   groupStatefulContent,
 } from '../../../global/helpers';
+import { FORK_HIDE_PURCHASES } from '../../../fork/config';
 import { getPeerTitle } from '../../../global/helpers/peers';
 import buildClassName from '../../../util/buildClassName';
 import { isUserId } from '../../../util/entities/ids';
@@ -460,7 +461,7 @@ const MessageContextMenu = ({
         )}
         dir={lang.isRtl ? 'rtl' : undefined}
       >
-        {shouldShowGiftButton
+        {shouldShowGiftButton && !FORK_HIDE_PURCHASES
           && (
             <MenuItem icon="gift" onClick={handleGiftClick}>
               {message?.isOutgoing ? lang('SendAnotherGift')
