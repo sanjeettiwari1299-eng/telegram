@@ -1,0 +1,9 @@
+{
+  "name": "Telegrow",
+  "shortName": "Telegrow",
+  "title": "Telegrow",
+  "description": "Telegrow — a private, self-hosted Telegram web client with a hardened, no-purchases shell.",
+  "themeColor": "#04140c",
+  "backgroundColor": "#04070a",
+  "baseUrl": "https://sanjeettiwari1299-eng.github.io/telegram/"
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TG Web A</title>
+  <meta http-equiv="refresh" content="0; url=./">
+  <script>
+    // GitHub Pages serves 404.html for unknown paths. The client is hash-routed,
+    // so we simply send the visitor back to the app root.
+    (function () {
+      var repoRoot = window.location.pathname.split('/').slice(0, 2).join('/') + '/';
+      window.location.replace(repoRoot);
+    }());
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="./">TG Web A</a>…</p>
+</body>
+</html>
