@@ -1,7 +1,7 @@
 {
-    "name": "TG Web A",
-    "short_name": "TG Web A",
-    "description": "A personal fork of Telegram Web A — fast, secure messaging in your browser.",
+    "name": "Telegrow",
+    "short_name": "Telegrow",
+    "description": "Telegrow — a private, self-hosted Telegram web client with a hardened, no-purchases shell.",
     "start_url": "./",
     "gcm_sender_id": "122867383838",
     "icons": [
@@ -44,7 +44,7 @@
             ]
         }
     },
-    "theme_color": "#6c4bf6",
-    "background_color": "#12102a",
+    "theme_color": "#04140c",
+    "background_color": "#04070a",
     "display": "standalone"
 }

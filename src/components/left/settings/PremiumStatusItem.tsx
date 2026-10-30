@@ -3,6 +3,8 @@ import { getActions } from '../../../global';
 
 import type { ApiPremiumSection } from '../../../api/types';
 
+import { FORK_HIDE_PURCHASES } from '../../../fork/config';
+
 import useLang from '../../../hooks/useLang';
 import useLastCallback from '../../../hooks/useLastCallback';
 
@@ -15,6 +17,8 @@ type OwnProps = {
 };
 
 function PremiumStatusItem({ premiumSection }: OwnProps) {
+  if (FORK_HIDE_PURCHASES) return undefined;
+
   const { openPremiumModal } = getActions();
   const lang = useLang();
   const handleOpenPremiumModal = useLastCallback(() => openPremiumModal({ initialSection: premiumSection }));

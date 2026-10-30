@@ -4,6 +4,7 @@ import { getActions } from '../../../global';
 import type { IconName } from '../../../types/icons';
 
 import { MUTE_INDEFINITE_TIMESTAMP, UNMUTE_TIMESTAMP } from '../../../config';
+import { FORK_HIDE_PURCHASES } from '../../../fork/config';
 import buildClassName from '../../../util/buildClassName';
 
 import useLang from '../../../hooks/useLang';
@@ -203,7 +204,7 @@ const FooterActionBar = ({
         >
           {mainButton.label}
         </Button>
-        {withGift && (
+        {withGift && !FORK_HIDE_PURCHASES && (
           <div className={styles.sideSlot}>
             <Button
               round

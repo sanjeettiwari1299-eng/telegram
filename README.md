@@ -1,19 +1,73 @@
-# TG Web A — a fork of Telegram Web A
+# Telegrow — a hardened fork of Telegram Web A
 
-A personal, self-hosted fork of [Telegram Web A](https://github.com/Ajaxy/telegram-tt) (the official
-client behind [web.telegram.org/a](https://web.telegram.org/a)), re-branded and deployed to
-**GitHub Pages**.
+A personal, self-hosted Telegram web client: the full [Telegram Web A](https://github.com/Ajaxy/telegram-tt)
+code base (the official client behind [web.telegram.org/a](https://web.telegram.org/a)), re-branded as
+**Telegrow**, with every purchase surface stripped out, deployed automatically to **GitHub Pages**.
 
 - 🌐 Live site: **https://sanjeettiwari1299-eng.github.io/telegram/**
-- 🎨 Brand: **TG Web A** (custom logo, PWA name, colors)
+- 🖤 Brand: **Telegrow** — dark terminal look, custom logo, custom PWA metadata
+- 🚫 **No Telegram Premium, no Stars, no gifts, no purchase buttons**
+- 👋 Custom boot screen: `WELCOME BACK, LAKSHAY` on every open
 - ⚙️ Deploy: GitHub Actions → GitHub Pages (`.github/workflows/deploy-pages.yml`)
 - 📜 License: GPL-3.0-or-later (same as upstream)
 
-> Telegram Web A won first prize in the [Telegram Lightweight Client Contest](https://contest.com/javascript-web-3).
-> It has almost no runtime dependencies and is built on its own [Teact](https://github.com/Ajaxy/teact)
-> framework plus a custom build of GramJS for MTProto.
+---
+
+## What this fork changes
+
+Everything fork-specific lives in **`src/fork/`**, so upstream merges stay clean.
+
+| Area | File | What it does |
+| --- | --- | --- |
+| Brand + toggles | `src/fork/config.ts` | App name, owner name, purchase kill-switch, welcome screen settings |
+| Purchase guards | `src/fork/guards.ts` | Blocks Premium / gifts / Stars actions at the action layer |
+| Boot screen | `src/components/fork/WelcomeOverlay.tsx` | Terminal-style “welcome back” animation |
+| Brand strings | `branding.json` | PWA name, description, theme colors |
+| Icons | `dev/branding/` | Logo source + generators for the whole icon set |
+
+### Removed purchase surfaces
+
+- Settings → **Telegram Premium**, **Stars**, **Gram**, **Send a gift** rows
+- **Premium** upsell badges in privacy screens (`PremiumStatusItem`)
+- **Gift** button in the chat header/footer and the profile menu
+- Action-level hard guards: `openPremiumModal`, `openGiftModal`, `openStarsGiftingPickerModal`
+  are rejected, so no hidden button, deep link or keyboard shortcut can open a payment flow
+  (you get a `Purchases are disabled on Telegrow.` toast instead)
+
+### Welcome screen
+
+On every app open a terminal-style overlay types a boot sequence and shows
+`WELCOME BACK, LAKSHAY` with an `access granted` line. It closes on its own after ~4 seconds,
+or immediately on any key/click. Tune it in `src/fork/config.ts`:
+
+```ts
+export const FORK_OWNER_NAME = 'Lakshay';       // name in the greeting
+export const FORK_SHOW_WELCOME = true;          // false to turn it off
+export const FORK_WELCOME_DURATION = 4200;      // ms on screen
+```
 
 ---
+
+## Will this need maintenance?
+
+Short answer: **no routine updates.** It is a static site; GitHub Pages serves it, nothing to restart,
+no servers, no database. It keeps working as long as Telegram keeps the current MTProto/API schema.
+
+You only need to touch it when:
+
+1. **Telegram changes the API / MTProto schema** (a few times a year upstream, usually never breaking
+   for months). Fix = merge upstream and redeploy:
+   ```sh
+   git fetch upstream
+   git merge upstream/master        # resolve conflicts in src/fork/* if any
+   git push
+   ```
+   The Pages workflow redeploys automatically on push.
+2. **You change the branding** → edit `branding.json`, run `node dev/branding/applyBranding.mjs`, push.
+3. **GitHub actions deprecations** → occasionally bump `actions/checkout@v5` etc. GitHub prints a
+   warning in the workflow log when that happens.
+
+Everything else (Telegram API keys, secrets, hosting, deploys) is set once.
 
 ## 1. Local setup
 
@@ -33,86 +87,66 @@ TELEGRAM_API_HASH=your_api_hash
 BASE_URL=http://localhost:1234/
 ```
 
-Get `api_id` / `api_hash` from <https://my.telegram.org> → *API development tools*
-(you need a Telegram account; each app you register gets its own pair).
-
-**Never commit `.env`.** It is git-ignored.
+Get `api_id` / `api_hash` from <https://my.telegram.org> → *API development tools*.
+**Never commit `.env`** — it is git-ignored.
 
 ## 2. Going live on GitHub Pages
 
-The workflow at `.github/workflows/deploy-pages.yml` builds the app and publishes `dist/` to Pages
-on every push to `main` or to an `arena/**` branch.
+The workflow builds the app and publishes `dist/` on every push to `main` or an `arena/**` branch.
 
-One-time setup in the repository:
+One-time setup (needs repository admin):
 
-1. **Add your Telegram credentials**
-   *Settings → Secrets and variables → Actions → New repository secret*
-   - `TELEGRAM_API_ID` — your numeric API ID
-   - `TELEGRAM_API_HASH` — your API hash
-2. **Enable Pages**
-   *Settings → Pages → Build and deployment → Source:* **GitHub Actions**
-3. **Allow the workflow to deploy**
-   *Settings → Actions → General → Workflow permissions:* **Read and write permissions**
+1. **Add Telegram credentials** — *Settings → Secrets and variables → Actions → New repository secret*
+   - `TELEGRAM_API_ID`
+   - `TELEGRAM_API_HASH`
+2. **Enable Pages** — *Settings → Pages → Build and deployment → Source:* **GitHub Actions**
+3. **Allow the workflow to deploy** — *Settings → Actions → General → Workflow permissions:*
+   **Read and write permissions**
 
-Then push, or run **Actions → Deploy to GitHub Pages → Run workflow** manually.
+Then run **Actions → Deploy to GitHub Pages → Run workflow** (or just push).
 
-Without the two secrets the build still succeeds and the site is published, but logging in will fail —
-Telegram rejects the placeholder API ID. Add the secrets and re-run the workflow to fix it.
+Without the two secrets the site still deploys, but login fails because Telegram rejects the
+placeholder API ID. Full walkthrough: [`docs/PAGES-SETUP.md`](docs/PAGES-SETUP.md).
 
-The Pages base URL is computed automatically (`https://<owner>.github.io/<repo>/`), so the same
-workflow works for forks with a different repository name.
-
-## 3. Customising the fork
+## 3. Rebranding
 
 All brand strings live in [`branding.json`](branding.json):
 
 ```json
 {
-  "name": "TG Web A",
-  "shortName": "TG Web A",
-  "title": "TG Web A",
-  "description": "A personal fork of Telegram Web A — fast, secure messaging in your browser.",
-  "themeColor": "#6c4bf6",
-  "backgroundColor": "#12102a",
+  "name": "Telegrow",
+  "shortName": "Telegrow",
+  "title": "Telegrow",
+  "description": "Telegrow — a private, self-hosted Telegram web client …",
+  "themeColor": "#04140c",
+  "backgroundColor": "#04070a",
   "baseUrl": "https://sanjeettiwari1299-eng.github.io/telegram/"
 }
 ```
 
-Apply it to the web app shell (PWA manifests, meta tags, tile color, `.env`):
+Apply it (PWA manifests, meta tags, tile color, `.env`):
 
 ```sh
 node dev/branding/applyBranding.mjs
 ```
 
-Regenerate the whole icon set (PWA icons, favicons, Apple touch icon, Windows tile) from
-`dev/branding/logo-source.png`:
+Rebuild the icon set from `dev/branding/logo-source.png`:
 
 ```sh
 pip install pillow
 python3 dev/branding/make_icons.py
 ```
 
-For Pages deployments you can override the title without touching the repo:
-*Settings → Secrets and variables → Actions → Variables →* `APP_TITLE`.
+For Pages builds, `APP_TITLE` can also be overridden with a repository *variable*
+(*Settings → Secrets and variables → Actions → Variables*).
 
-Runtime behaviour that is worth knowing about as a fork owner:
-
-- `src/config.ts` — app name, API keys, cache names, limits.
-- `src/styles/themes.json` — colour themes (change the default accent here).
-- `public/site*.webmanifest` — PWA metadata (regenerated by the branding script).
-- `public/404.html` — redirects unknown paths back to the app root on Pages.
-
-## 4. Staying in sync with upstream
+## 4. Upstream sync
 
 ```sh
-git remote add upstream https://github.com/Ajaxy/telegram-tt.git   # already added
+git remote add upstream https://github.com/Ajaxy/telegram-tt.git   # already configured
 git fetch upstream
 git merge upstream/master
 ```
-
-Branding files (`branding.json`, `dev/branding/*`, `public/icon-*`, `public/favicon*`,
-`public/site*.webmanifest`, `README.md`, `.github/workflows/deploy-pages.yml`) are the only files this
-fork intentionally diverges on, so conflicts are usually limited to those.
 
 ## 5. Project scripts
 
@@ -129,4 +163,4 @@ fork intentionally diverges on, so conflicts are usually limited to those.
 
 Original work © Alexander Zinchuk and Telegram Web A contributors, GPL-3.0-or-later.
 This fork keeps the same license; all modifications stay in this repository.
-Logos and brand assets in this fork are custom-made and are not official Telegram artwork.
+The Telegrow logo and brand assets are custom-made and are not official Telegram artwork.

@@ -2,6 +2,7 @@ import type { ApiSavedStarGift, ApiStarGiftUnique } from '../../../api/types';
 import type { ActionReturnType } from '../../types';
 
 import { STARS_CURRENCY_CODE } from '../../../config';
+import { isPurchaseBlocked, PURCHASE_BLOCKED_MESSAGE } from '../../../fork/guards';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { addTabStateResetterAction } from '../../helpers/meta';
 import { getPrizeStarsTransactionFromGiveaway, getStarsTransactionFromGift } from '../../helpers/payments';
@@ -81,6 +82,11 @@ addActionHandler('openGiftRecipientPicker', (global, actions, payload): ActionRe
 addTabStateResetterAction('closeGiftRecipientPicker', 'isGiftRecipientPickerOpen');
 
 addActionHandler('openStarsGiftingPickerModal', (global, actions, payload): ActionReturnType => {
+  if (isPurchaseBlocked()) {
+    actions.showNotification({ message: PURCHASE_BLOCKED_MESSAGE, tabId: getCurrentTabId() });
+    return undefined;
+  }
+
   const {
     tabId = getCurrentTabId(),
   } = payload || {};

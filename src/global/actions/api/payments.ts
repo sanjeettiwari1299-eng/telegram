@@ -11,6 +11,7 @@ import type {
 import { PaymentStep } from '../../../types';
 
 import { TON_CURRENCY_CODE, USD_CURRENCY_CODE } from '../../../config';
+import { isPurchaseBlocked, PURCHASE_BLOCKED_MESSAGE } from '../../../fork/guards';
 import { getCurrentTabId } from '../../../util/establishMultitabRole';
 import { getStripeError } from '../../../util/payments/stripe';
 import { getServerTime } from '../../../util/serverTime';
@@ -523,6 +524,11 @@ addActionHandler('closePremiumModal', (global, actions, payload): ActionReturnTy
 });
 
 addActionHandler('openPremiumModal', async (global, actions, payload): Promise<void> => {
+  if (isPurchaseBlocked()) {
+    actions.showNotification({ message: PURCHASE_BLOCKED_MESSAGE, tabId: getCurrentTabId() });
+    return;
+  }
+
   const {
     initialSection, fromUserId, isSuccess, isGift, daysAmount, toUserId, gift,
     tabId = getCurrentTabId(),
@@ -614,6 +620,11 @@ addActionHandler('checkCanSendGift', async (global, actions, payload): Promise<v
 });
 
 addActionHandler('openGiftModal', async (global, actions, payload): Promise<void> => {
+  if (isPurchaseBlocked()) {
+    actions.showNotification({ message: PURCHASE_BLOCKED_MESSAGE, tabId: getCurrentTabId() });
+    return;
+  }
+
   const {
     forUserId, selectedGift, selectedResaleGift, tabId = getCurrentTabId(),
   } = payload;

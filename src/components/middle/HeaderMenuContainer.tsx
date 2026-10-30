@@ -12,6 +12,7 @@ import type { RegularLangKey } from '../../types/language';
 import { MAIN_THREAD_ID } from '../../api/types';
 
 import { UNMUTE_TIMESTAMP } from '../../config';
+import { FORK_HIDE_PURCHASES } from '../../fork/config';
 import {
   getCanAddContact,
   getCanDeleteChat,
@@ -872,7 +873,7 @@ const HeaderMenuContainer = ({
             </MenuItem>
           )}
           {botButtons}
-          {canGift && (
+          {canGift && !FORK_HIDE_PURCHASES && (
             <MenuItem
               icon="gift"
               onClick={handleGiftClick}

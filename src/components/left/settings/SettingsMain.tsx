@@ -5,6 +5,7 @@ import type { ApiStarsAmount, ApiTonAmount } from '../../../api/types';
 import { SettingsScreens } from '../../../types';
 
 import { FAQ_URL, PRIVACY_URL, TON_CURRENCY_CODE } from '../../../config';
+import { FORK_HIDE_PURCHASES } from '../../../fork/config';
 import { formatStarsAmount } from '../../../global/helpers/payments';
 import {
   selectIsGiveawayGiftsPurchaseAvailable,
@@ -216,64 +217,66 @@ const SettingsMain = ({
           </ListItem>
         </Island>
 
-        <Island>
-          {canBuyPremium && (
-            <ListItem
-              icon="star"
-              iconBg="premium"
-              narrow
-              onClick={() => openPremiumModal()}
-            >
-              {lang('TelegramPremium')}
-            </ListItem>
-          )}
-
-          <ListItem
-            icon="stars-filled"
-            iconBg="orange"
-            narrow
-            onClick={() => openStarsBalanceModal({})}
-          >
-            {lang('MenuStars')}
-            {Boolean(starsBalance) && (
-              <span className="settings-item__current-value">
-                {formatStarsAsIcon(lang, formatStarsAmount(lang, starsBalance), {
-                  asFont: true,
-                  withIconLast: true,
-                  className: styles.balanceStar,
-                })}
-              </span>
+        {!FORK_HIDE_PURCHASES && (
+          <Island>
+            {canBuyPremium && (
+              <ListItem
+                icon="star"
+                iconBg="premium"
+                narrow
+                onClick={() => openPremiumModal()}
+              >
+                {lang('TelegramPremium')}
+              </ListItem>
             )}
-          </ListItem>
 
-          <ListItem
-            icon="gram-filled"
-            iconBg="blue"
-            narrow
-            onClick={() => openStarsBalanceModal({ currency: TON_CURRENCY_CODE })}
-          >
-            {lang('GramEarnings')}
-            {Boolean(tonBalance) && (
-              <span className="settings-item__current-value">
-                {formatTonAsIcon(lang, tonBalance.amount, {
-                  withIconLast: true,
-                  className: styles.balanceGem,
-                })}
-              </span>
-            )}
-          </ListItem>
-
-          {isGiveawayAvailable && (
             <ListItem
-              icon="gift-filled"
+              icon="stars-filled"
               iconBg="orange"
               narrow
-              onClick={() => openGiftRecipientPicker()}
+              onClick={() => openStarsBalanceModal({})}
             >
-              {lang('MenuSendGift')}
+              {lang('MenuStars')}
+              {Boolean(starsBalance) && (
+                <span className="settings-item__current-value">
+                  {formatStarsAsIcon(lang, formatStarsAmount(lang, starsBalance), {
+                    asFont: true,
+                    withIconLast: true,
+                    className: styles.balanceStar,
+                  })}
+                </span>
+              )}
             </ListItem>
-          )}
-        </Island>
+
+            <ListItem
+              icon="gram-filled"
+              iconBg="blue"
+              narrow
+              onClick={() => openStarsBalanceModal({ currency: TON_CURRENCY_CODE })}
+            >
+              {lang('GramEarnings')}
+              {Boolean(tonBalance) && (
+                <span className="settings-item__current-value">
+                  {formatTonAsIcon(lang, tonBalance.amount, {
+                    withIconLast: true,
+                    className: styles.balanceGem,
+                  })}
+                </span>
+              )}
+            </ListItem>
+
+            {isGiveawayAvailable && (
+              <ListItem
+                icon="gift-filled"
+                iconBg="orange"
+                narrow
+                onClick={() => openGiftRecipientPicker()}
+              >
+                {lang('MenuSendGift')}
+              </ListItem>
+            )}
+          </Island>
+        )}
 
         <Island>
           <ListItem

@@ -66,8 +66,8 @@ jobs:
             echo "TELEGRAM_API_ID=${API_ID}"
             echo "TELEGRAM_API_HASH=${API_HASH}"
             echo "BASE_URL=${BASE_URL}"
-            echo "APP_TITLE=${APP_TITLE:-TG Web A}"
-            echo "APP_NAME=${APP_TITLE:-TG Web A}"
+            echo "APP_TITLE=${APP_TITLE:-Telegrow}"
+            echo "APP_NAME=${APP_TITLE:-Telegrow}"
           } > .env
 
           cat .env | sed 's/^TELEGRAM_API_HASH=.*/TELEGRAM_API_HASH=***/'
