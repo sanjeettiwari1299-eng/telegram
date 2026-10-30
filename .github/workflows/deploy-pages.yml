@@ -6,6 +6,7 @@ on:
       - main
       - 'arena/**'
   workflow_dispatch:
+  workflow_call:
 
 # Allow one concurrent deployment, cancel queued ones for the same ref
 concurrency:

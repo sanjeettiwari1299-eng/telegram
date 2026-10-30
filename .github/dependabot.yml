@@ -1,0 +1,23 @@
+version: 2
+
+# Keeps the GitHub Actions used by this repo up to date automatically.
+# npm dependencies are intentionally NOT bumped here: they come from upstream
+# (Ajaxy/telegram-tt) through the weekly `Sync upstream` workflow, and the fork
+# must not diverge from the lockfile upstream ships.
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '04:30'
+      timezone: 'Asia/Kolkata'
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'ci'
+    labels:
+      - 'dependencies'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
