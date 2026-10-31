@@ -7,9 +7,11 @@ import type { GlobalState } from '../../global/types';
 
 import { IS_TAURI } from '../../util/browser/globalEnvironment';
 import { IS_MAC_OS, PLATFORM_ENV } from '../../util/browser/windowEnvironment';
+import { FORK_NAME, FORK_OWNER_NAME } from '../../fork/config';
 
 import useCurrentOrPrev from '../../hooks/useCurrentOrPrev';
 import useHistoryBack from '../../hooks/useHistoryBack';
+import useLang from '../../hooks/useLang';
 
 import Transition from '../ui/Transition';
 import AuthCode from './AuthCode.async';
@@ -31,6 +33,7 @@ const Auth = ({
     returnToAuthPhoneNumber, goToAuthQrCode,
   } = getActions();
 
+  const lang = useLang();
   const isMobile = PLATFORM_ENV === 'iOS' || PLATFORM_ENV === 'Android';
 
   const handleChangeAuthorizationMethod = () => {
@@ -88,14 +91,32 @@ const Auth = ({
   }
 
   return (
-    <Transition
-      activeKey={getActiveKey()}
-      name="fade"
-      className="Auth"
-      data-tauri-drag-region={IS_TAURI && IS_MAC_OS ? true : undefined}
-    >
-      {getScreen()}
-    </Transition>
+    <div className="auth-experience">
+      <aside className="auth-intro">
+        <div className="auth-intro-brand">
+          <span className="auth-intro-mark" aria-hidden="true" />
+          <span>
+            {FORK_NAME}
+            <small>{lang('ForkPersonalEdition')}</small>
+          </span>
+        </div>
+        <div className="auth-intro-content">
+          <span className="auth-intro-eyebrow">{lang('ForkMadeForYou')}</span>
+          <h2>{lang('ForkWelcomeTitle')}</h2>
+          <p>{lang('ForkWelcomeDescription')}</p>
+          <div className="auth-intro-signature">{lang('ForkMadeBy', { name: FORK_OWNER_NAME })}</div>
+        </div>
+        <div className="auth-intro-footer">{lang('ForkTelegramClient')}</div>
+      </aside>
+      <Transition
+        activeKey={getActiveKey()}
+        name="fade"
+        className="Auth"
+        data-tauri-drag-region={IS_TAURI && IS_MAC_OS ? true : undefined}
+      >
+        {getScreen()}
+      </Transition>
+    </div>
   );
 };
 

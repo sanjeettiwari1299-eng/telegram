@@ -100,17 +100,6 @@ if (existsSync(envPath) || existsSync(envExamplePath)) {
 //   - src/fork/strings.ts       (heading text, wins over every language pack)
 // This step keeps the wordmark in the tagline in sync with branding.json.
 // ---------------------------------------------------------------------------
-const forkScssPath = resolve(rootDir, 'src/fork/branding.scss');
-if (existsSync(forkScssPath)) {
-  const tagline = `${name.toUpperCase()} // encrypted \u00b7 private \u00b7 no ads`;
-  const scss = readFileSync(forkScssPath, 'utf8');
-  const nextScss = scss.replace(/(content: ")[^"]*(";)/, `$1${tagline}$2`);
-  if (nextScss !== scss) {
-    writeFileSync(forkScssPath, nextScss);
-    console.log('\u2713 src/fork/branding.scss');
-  }
-}
-
 const forkStringsPath = resolve(rootDir, 'src/fork/strings.ts');
 if (existsSync(forkStringsPath)) {
   const strings = readFileSync(forkStringsPath, 'utf8');

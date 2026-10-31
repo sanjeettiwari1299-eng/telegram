@@ -258,3 +258,135 @@
     transform: scale(1);
   }
 }
+
+.auth-experience {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
+}
+
+.auth-intro {
+  position: relative;
+
+  overflow: hidden;
+  display: flex;
+  flex: 1 1 50%;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-width: 0;
+  padding: 3rem 4rem;
+
+  color: #eaf8ef;
+
+  background:
+    radial-gradient(ellipse at 15% 80%, #205c44 0%, transparent 55%),
+    linear-gradient(145deg, #142f29, #081b18 75%);
+}
+
+.auth-intro::after {
+  pointer-events: none;
+  content: "";
+
+  position: absolute;
+  right: -12rem;
+  bottom: -20rem;
+
+  width: 40rem;
+  height: 40rem;
+  border: 1px solid rgba(173, 239, 196, 0.14);
+  border-radius: 50%;
+
+  box-shadow: 0 0 0 5rem rgba(173, 239, 196, 0.035), 0 0 0 10rem rgba(173, 239, 196, 0.025);
+}
+
+.auth-intro-brand {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.03em;
+}
+
+.auth-intro-brand small {
+  display: block;
+
+  margin-top: 0.125rem;
+
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-medium);
+  color: #a9c7b6;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-intro-mark {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+  background: url("../../assets/telegrow-logo.svg") center / cover;
+}
+
+.auth-intro-content {
+  position: relative;
+  z-index: 1;
+  max-width: 30rem;
+  margin: auto 0;
+}
+
+.auth-intro-eyebrow {
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: #91e3ae;
+  letter-spacing: 0.16em;
+}
+
+.auth-intro-content h2 {
+  margin: 1.25rem 0;
+
+  font-size: clamp(2.75rem, 4.5vw, 4.75rem);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.07;
+  letter-spacing: -0.055em;
+}
+
+.auth-intro-content p {
+  max-width: 22rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #b6cfc1;
+}
+
+.auth-intro-signature {
+  display: inline-block;
+
+  margin-top: 1.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(173, 239, 196, 0.25);
+  border-radius: 2rem;
+
+  font-size: 0.75rem;
+  color: #cbefda;
+  letter-spacing: 0.04em;
+}
+
+.auth-intro-footer {
+  font-size: 0.75rem;
+  color: #9bb9a8;
+  letter-spacing: 0.04em;
+}
+
+.auth-experience > .Auth {
+  flex: 1 1 50%;
+  min-width: 0;
+  background: var(--color-background);
+}
+
+@media (max-width: 800px) {
+  .auth-intro {
+    display: none;
+  }
+}

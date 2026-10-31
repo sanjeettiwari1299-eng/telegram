@@ -12,6 +12,7 @@ import { selectCommunityPanelId } from '../../../global/selectors';
 import { IS_TAURI } from '../../../util/browser/globalEnvironment';
 import { IS_TOUCH_ENV } from '../../../util/browser/windowEnvironment';
 import buildClassName from '../../../util/buildClassName';
+import { FORK_NAME, FORK_OWNER_NAME } from '../../../fork/config';
 
 import useSelector from '../../../hooks/data/useSelector';
 import useInterval from '../../../hooks/schedulers/useInterval';
@@ -197,6 +198,16 @@ const LeftMain = ({
       onMouseEnter={!IS_TOUCH_ENV ? handleMouseEnter : undefined}
       onMouseLeave={!IS_TOUCH_ENV ? handleMouseLeave : undefined}
     >
+      {content === LeftColumnContent.ChatList && !isForumPanelVisible && (
+        <div className="personal-brand">
+          <span className="personal-brand-mark" aria-hidden="true" />
+          <span className="personal-brand-copy">
+            <span className="personal-brand-name">{FORK_NAME}</span>
+            <span className="personal-brand-caption">{lang('ForkMadeBy', { name: FORK_OWNER_NAME })}</span>
+          </span>
+          <span className="personal-brand-edition">{lang('ForkPersonalEdition')}</span>
+        </div>
+      )}
       <LeftMainHeader
         shouldHideSearch={isForumPanelVisible}
         content={content}

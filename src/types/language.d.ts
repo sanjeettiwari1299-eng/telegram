@@ -3376,6 +3376,11 @@ export interface LangPair {
   'SettingsKeywordsLastSeen': undefined;
   'SettingsKeywordsLogOut': undefined;
   'SettingsSearchEmpty': undefined;
+  'ForkPersonalEdition': undefined;
+  'ForkMadeForYou': undefined;
+  'ForkWelcomeTitle': undefined;
+  'ForkWelcomeDescription': undefined;
+  'ForkTelegramClient': undefined;
 }
 
 export interface LangPairWithVariables<V = LangVariable> {
@@ -5629,6 +5634,9 @@ export interface LangPairWithVariables<V = LangVariable> {
   'PeerPickerUnknownPeer': {
     'id': V;
   };
+  'ForkMadeBy': {
+    'name': V;
+  };
 }
 
 export interface LangPairPlural {
@@ -6619,7 +6627,8 @@ export interface LangKeyGroups {
       | 'WalletConnectRequestAppProcessed'
       | 'WalletConnectRequestAppDeclined'
       | 'WalletConnectRequestAppExpired'
-      | 'WalletConnectSignTitle';
+      | 'WalletConnectSignTitle'
+      | 'ForkMadeBy';
     variables: 'name';
   };
   'limit,premiumLimit': {

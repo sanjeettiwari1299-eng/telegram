@@ -5,6 +5,12 @@ import type { LangPackStringValue } from '../../api/types';
 import type { LangKey } from '../../types/language';
 
 export default {
+  "ForkPersonalEdition": "Personal edition",
+  "ForkMadeForYou": "A LITTLE MORE YOU",
+  "ForkWelcomeTitle": "Your conversations. Your space.",
+  "ForkWelcomeDescription": "A familiar way to stay close, made a little more personal.",
+  "ForkMadeBy": "Made by {name}",
+  "ForkTelegramClient": "An independent Telegram client",
   "TestServer": "Test server",
   "PageTitleInactive": "[Inactive]",
   "AuthTitle": "Telegram",

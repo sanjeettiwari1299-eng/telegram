@@ -1,6 +1,13 @@
 import type { LangKey } from '../../types/language';
 
 const INITIAL_KEYS: LangKey[] = [
+  'ForkPersonalEdition',
+  'ForkMadeForYou',
+  'ForkWelcomeTitle',
+  'ForkWelcomeDescription',
+  'ForkMadeBy',
+  'ForkTelegramClient',
+
   'TestServer',
   'PageTitleInactive',
   'AuthTitle',
