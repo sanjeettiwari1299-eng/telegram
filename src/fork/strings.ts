@@ -15,6 +15,8 @@
 import type { LangKey } from '../types/language';
 
 export const FORK_STRING_OVERRIDES: Partial<Record<LangKey, string>> = {
+  AuthTitle: 'Telegrow',
+
   // Login screen heading (QR view)
   LoginQRTitle: 'Welcome to Telegrow',
 

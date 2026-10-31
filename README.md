@@ -95,11 +95,13 @@ Telegram mark back:
 | File | What it does |
 | --- | --- |
 | `src/assets/telegrow-logo.svg` | Telegrow mark (used by the login logo, the QR center tile and the phone screen) |
-| `src/fork/branding.scss` | High-specificity overrides: logo, emerald accent, QR plane, `TELEGROW // encrypted · private · no ads` tagline |
+| `src/fork/branding.scss` | High-specificity overrides for the logo and QR mark |
 | `src/fork/strings.ts` | String overrides applied before any language pack — e.g. `LoginQRTitle` → *Welcome to Telegrow* |
 
-`node dev/branding/applyBranding.mjs` re-syncs the wordmark/tagline with `branding.json`
-(and `index.html`, manifests, `.env`). Strings that refer to the *phone* app
+`src/fork/config.ts` controls the in-app name, owner and welcome text; change `FORK_OWNER_NAME` to personalize the signature. The login layout and chat list carry this identity, and the default light and dark themes use an emerald palette.
+
+`node dev/branding/applyBranding.mjs` syncs the static shell and QR login heading with `branding.json`
+(`index.html`, manifests, `.env`). Strings that refer to the *phone* app
 (“Open Telegram on your phone”) are intentionally left alone — that app is real.
 
 ## Automatic updates (zero maintenance)

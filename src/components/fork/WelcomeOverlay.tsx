@@ -1,19 +1,17 @@
 import { useEffect, useState } from '../../lib/teact/teact';
 
+import buildClassName from '../../util/buildClassName';
 import {
   FORK_NAME, FORK_OWNER_NAME, FORK_SHOW_WELCOME, FORK_TAGLINE, FORK_WELCOME_DURATION,
 } from '../../fork/config';
-import buildClassName from '../../util/buildClassName';
 
 import styles from './WelcomeOverlay.module.scss';
 
 const BOOT_LINES = [
   { text: `> boot --shell=${FORK_NAME.toLowerCase()} --secure`, isAccent: true },
-  { text: '[ ok ] mtproto handshake ......... verified' },
-  { text: '[ ok ] session keys ............... rotated' },
-  { text: '[ ok ] channel ..................... encrypted' },
-  { text: '[ ok ] device fingerprint ......... trusted' },
-  { text: '> identity accepted', isAccent: true },
+  { text: '[ .. ] preparing your space' },
+  { text: '[ .. ] loading your conversations' },
+  { text: '> welcome home', isAccent: true },
 ];
 
 const LINE_INTERVAL = 230;
@@ -74,7 +72,10 @@ function WelcomeOverlay() {
           <span className={styles.dot} />
           <span className={styles.dot} />
           <span className={styles.dot} />
-          <em className={styles.title}>{FORK_NAME.toLowerCase()}://secure-shell</em>
+          <em className={styles.title}>
+            {FORK_NAME.toLowerCase()}
+            ://secure-shell
+          </em>
         </div>
 
         <div className={styles.body}>
@@ -90,10 +91,15 @@ function WelcomeOverlay() {
           {isGreetingVisible && (
             <div className={styles.greeting}>
               <div className={styles.greetingTitle}>
-                WELCOME BACK, {FORK_OWNER_NAME.toUpperCase()}
+                WELCOME BACK,
+                {' '}
+                {FORK_OWNER_NAME.toUpperCase()}
               </div>
               <div className={styles.greetingSub}>
-                access granted · {FORK_TAGLINE} · {FORK_NAME}
+                {FORK_TAGLINE}
+                {' '}
+                ·
+                {FORK_NAME}
               </div>
             </div>
           )}

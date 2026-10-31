@@ -7,7 +7,7 @@
 
 export const FORK_NAME = 'Telegrow';
 export const FORK_OWNER_NAME = 'Lakshay';
-export const FORK_TAGLINE = 'private messaging shell';
+export const FORK_TAGLINE = 'your personal messaging space';
 
 /**
  * Telegram Premium / Stars / gifts are purchase surfaces. They are switched off
@@ -20,7 +20,7 @@ export const FORK_HIDE_PURCHASES = true;
 export const FORK_SHOW_WELCOME = true;
 
 /** How long the welcome screen stays on screen, in ms (includes the fade out). */
-export const FORK_WELCOME_DURATION = 4200;
+export const FORK_WELCOME_DURATION = 1800;
 
 /**
  * Telegram Ads (sponsored messages) and the sponsored search slot are switched
